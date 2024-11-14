@@ -24,15 +24,20 @@ app.get('/livros', async (req,res) => {
     }
 })
 
+app.get('/livros/:codigo', async (req, res) => {
+    const { codigo } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM livros WHERE codigo = $1', [codigo]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Livro não encontrado' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ error: 'Erro ao buscar o livro' });
+    }
+});
+
 app.listen(3000, () => {
     console.log("Servidor rodando gostoso na porta 3000");
-})
-
-app.get('/livros/:codigo', async (req,res) => {
-    const {codigo} = req.params;
-    try{
-        const result = await pool.query('SELECT * FROM livros WHERE codigo = $1', {codigo})
-    }catch(err){
-
-    }
 })
